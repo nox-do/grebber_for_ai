@@ -49,6 +49,13 @@ def install_context_menus() -> None:
         "Create dump.txt"
     )
     
+    # Add context menu for right-clicking directly on folders
+    create_context_menu(
+        "Directory\\shell\\CreateDump",
+        create_dump_cmd,
+        "Create dump.txt"
+    )
+    
     # Add to ignore for files
     create_context_menu(
         "AllFilesystemObjects\\shell\\AddToIgnore",

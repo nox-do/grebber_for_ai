@@ -3,13 +3,23 @@ import winreg
 def delete_context_menu(key_path: str) -> None:
     """Delete a context menu entry from the Windows Registry."""
     try:
-        # Delete the command subkey first
-        command_key = f"{key_path}\\shell\\command"
-        winreg.DeleteKey(winreg.HKEY_CLASSES_ROOT, command_key)
+        # Open the parent key
+        parent_key = winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, key_path, 0, winreg.KEY_ALL_ACCESS)
         
+        # Delete the command subkey first
+        try:
+            winreg.DeleteKey(parent_key, "shell\\command")
+        except WindowsError:
+            pass  # Key might not exist
+            
         # Delete the shell subkey
-        shell_key = f"{key_path}\\shell"
-        winreg.DeleteKey(winreg.HKEY_CLASSES_ROOT, shell_key)
+        try:
+            winreg.DeleteKey(parent_key, "shell")
+        except WindowsError:
+            pass  # Key might not exist
+            
+        # Close the parent key
+        winreg.CloseKey(parent_key)
         
         print(f"Removed context menu: {key_path}")
         
@@ -19,9 +29,8 @@ def delete_context_menu(key_path: str) -> None:
 
 def uninstall_context_menus() -> None:
     """Remove the context menu entries."""
-    # Remove context menus
-    delete_context_menu("Directory\\shell\\CreateDump")
-    delete_context_menu("*\\shell\\AddToIgnore")
+    # Remove only the AddToIgnore context menu
+    delete_context_menu("AllFilesystemObjects\\shell\\AddToIgnore")
     
     print("Context menu uninstallation completed successfully!")
 
