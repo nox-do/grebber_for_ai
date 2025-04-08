@@ -30,23 +30,28 @@ def create_context_menu(key_path: str, command: str, menu_text: str) -> None:
 
 def install_context_menus() -> None:
     """Install the context menu entries."""
-    # Get absolute paths
-    create_dump_script = get_script_path("create_dump.py")
-    add_to_ignore_script = get_script_path("add_to_ignore.py")
+    # Get absolute paths to scripts
+    scripts_dir = os.path.abspath(os.path.dirname(__file__))
+    create_dump_script = os.path.join(scripts_dir, "create_dump.py")
+    add_to_ignore_script = os.path.join(scripts_dir, "add_to_ignore.py")
     
-    # Create the commands with sys.executable
-    create_dump_cmd = f'"{sys.executable}" "{create_dump_script}" "%1"'
-    add_to_ignore_cmd = f'"{sys.executable}" "{add_to_ignore_script}" "%1"'
+    # Use global python
+    python_exe = "python.exe"
     
-    # Create context menus
+    # Create the commands with global python and absolute paths
+    create_dump_cmd = f'"{python_exe}" "{create_dump_script}" "%V"'
+    add_to_ignore_cmd = f'"{python_exe}" "{add_to_ignore_script}" "%L"'
+    
+    # Create context menus for both files and directories
     create_context_menu(
-        "Directory\\shell\\CreateDump",
+        "Directory\\Background\\shell\\CreateDump",
         create_dump_cmd,
         "Create dump.txt"
     )
     
+    # Add to ignore for files
     create_context_menu(
-        "*\\shell\\AddToIgnore",
+        "AllFilesystemObjects\\shell\\AddToIgnore",
         add_to_ignore_cmd,
         "Add to ignore for dump"
     )
