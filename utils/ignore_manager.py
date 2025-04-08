@@ -24,7 +24,12 @@ class IgnoreManager:
         """Save ignored paths to .dump_ignore file."""
         # Only create the file if there are paths to ignore
         if not self.ignored_paths:
+            if self.ignore_path.exists():
+                self.ignore_path.unlink()  # Remove empty ignore file
             return
+            
+        # Create parent directories if they don't exist
+        self.ignore_path.parent.mkdir(parents=True, exist_ok=True)
             
         with open(self.ignore_path, 'w', encoding='utf-8') as f:
             f.write("# Local ignore patterns for dump.txt creation\n")
