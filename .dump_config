@@ -1,0 +1,90 @@
+# Dump Configuration File
+# This file is automatically created and managed by the dump tool
+
+[general]
+# Timestamp of last dump creation
+last_dump_time = "2023-04-08T12:00:00Z"
+# Version of the dump tool that created this config
+version = "1.0.0"
+
+# Automatically detected Git repository
+[git]
+# Path to .git directory relative to this config
+git_dir = ".git"
+# Whether this is a Git repository
+is_git_repo = true
+
+# Language detection settings
+[language]
+# Automatically detected primary language
+primary_language = "python"
+# List of detected languages with confidence scores
+detected_languages = [
+    { name = "python", confidence = 0.8 },
+    { name = "javascript", confidence = 0.2 }
+]
+
+# Ignore patterns
+[ignore]
+# Standard ignore patterns (always applied)
+standard_patterns = [
+    ".git",
+    ".idea",
+    ".venv",
+    "__pycache__",
+    "node_modules",
+    "*.lock",
+    "*.log",
+    "dist",
+    "build"
+]
+
+# Custom ignore patterns (user-defined)
+custom_patterns = [
+    "temp/*",
+    "*.bak"
+]
+
+# Ignored files and directories (absolute paths)
+# This list is automatically cleaned during each dump
+ignored_paths = [
+    "/absolute/path/to/ignored/file1.py",
+    "/absolute/path/to/ignored/directory1"
+]
+
+# Language-specific settings
+[languages]
+# Python settings
+[languages.python]
+extensions = [".py"]
+marker_files = ["requirements.txt", "pyproject.toml"]
+comment_prefix = "#"
+
+# JavaScript settings
+[languages.javascript]
+extensions = [".js", ".jsx"]
+marker_files = ["package.json"]
+comment_prefix = "//"
+
+# TypeScript settings
+[languages.typescript]
+extensions = [".ts", ".tsx"]
+marker_files = ["tsconfig.json"]
+comment_prefix = "//"
+
+# Java settings
+[languages.java]
+extensions = [".java"]
+marker_files = ["pom.xml", "build.gradle"]
+comment_prefix = "//"
+
+# Output settings
+[output]
+# Default output format
+format = "text"
+# Whether to include line numbers
+include_line_numbers = true
+# Whether to include file headers
+include_file_headers = true
+# Maximum file size to include (in bytes)
+max_file_size = 1048576  # 1MB 

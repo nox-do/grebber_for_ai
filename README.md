@@ -7,6 +7,7 @@ A Windows context menu tool that creates a consolidated text file (`dump.txt`) c
 - Automatic language detection (Java, JavaScript, TypeScript, Python)
 - Smart file filtering (ignores common build/dependency directories)
 - Custom ignore list support
+- `.gitignore` integration (automatically uses existing `.gitignore` files)
 - Language-specific comment formatting
 - Windows context menu integration
 
@@ -38,6 +39,15 @@ A Windows context menu tool that creates a consolidated text file (`dump.txt`) c
 2. Select "Add to ignore for dump" from the context menu
 3. The file/directory will be added to the ignore list and won't be included in future dumps
 
+### Ignore List Management
+
+The tool uses multiple sources for determining which files to ignore:
+
+1. **Standard ignore patterns**: Built-in patterns for common build and dependency directories
+2. **Custom ignore patterns**: User-defined patterns stored in the `.dump_config` file
+3. **`.gitignore` patterns**: If a `.gitignore` file exists in the project, its patterns are automatically used
+4. **Explicitly ignored paths**: Specific files or directories added via the context menu
+
 ## Uninstallation
 
 To remove the context menu entries, double-click `uninstall.bat` or run it from an administrator command prompt:
@@ -64,7 +74,8 @@ create_dump_contextmenu/
 │
 ├── utils/
 │   ├── file_utils.py
-│   └── comment_utils.py
+│   ├── comment_utils.py
+│   └── config_manager.py
 │
 ├── data/
 │   └── ignore_list.txt

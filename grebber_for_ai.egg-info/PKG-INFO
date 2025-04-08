@@ -1,0 +1,7 @@
+Metadata-Version: 2.4
+Name: grebber_for_ai
+Version: 1.0.0
+Requires-Dist: pywin32==310
+Requires-Dist: toml==0.10.2
+Requires-Dist: gitpython==3.1.31
+Dynamic: requires-dist

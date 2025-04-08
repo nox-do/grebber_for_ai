@@ -1,0 +1,7 @@
+README.md
+setup.py
+grebber_for_ai.egg-info/PKG-INFO
+grebber_for_ai.egg-info/SOURCES.txt
+grebber_for_ai.egg-info/dependency_links.txt
+grebber_for_ai.egg-info/requires.txt
+grebber_for_ai.egg-info/top_level.txt
