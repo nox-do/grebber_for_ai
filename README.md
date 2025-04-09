@@ -1,107 +1,87 @@
-# Create Dump.txt Context Menu Tool
+# Grebber for AI
 
-A Windows context menu tool that creates a consolidated text file (`dump.txt`) containing all relevant code files from a project directory. The tool automatically detects the programming language and applies appropriate filtering and formatting.
+Ein Tool zum Erstellen von Code-Dumps für die Analyse durch KI-Modelle, integriert in das Windows Explorer Kontextmenü. Es sammelt relevante Dateien aus einem Projektverzeichnis, fasst sie in einer `dump.txt`-Datei zusammen und bietet flexible Optionen zum Ignorieren von Dateien und Verzeichnissen.
 
 ## Features
 
-- Automatic language detection (Java, JavaScript, TypeScript, Python)
-- Smart file filtering (ignores common build/dependency directories)
-- Custom ignore list support
-- `.gitignore` integration (automatically uses existing `.gitignore` files)
-- Language-specific comment formatting
-- Windows context menu integration
+*   **Kontextmenü-Integration:** Erstelle Dumps oder füge Dateien/Ordner zu Ignore-Listen hinzu direkt aus dem Windows Explorer.
+*   **Intelligente Dateiauswahl:** Sammelt Dateien basierend auf flexiblen Ignore-Regeln.
+*   **Ignore-Mechanismen:**
+    *   Respektiert automatisch die `.gitignore`-Datei deines Projekts.
+    *   Verwendet eine anpassbare Liste von Standard-Ignore-Mustern (z.B. für `node_modules`, `*.log`, `dump.txt`, `.gitignore`).
+    *   Ermöglicht das Hinzufügen projekt-spezifischer relativer Pfade zur lokalen Ignore-Liste (`.dump_ignore`).
+    *   Unterstützt globale Ignore-Muster und absolute Pfade über die Konfigurationsdatei.
+*   **Spracherkennung:** Erkennt die primäre Programmiersprache, um passende Kommentar-Präfixe in Datei-Headern zu verwenden (filtert Dateien *nicht* mehr nach Erweiterung).
+*   **Konfigurierbarer Output:** Steuere, ob Datei-Header eingefügt werden und lege eine maximale Dateigröße fest.
+*   **Zentralisierte Konfiguration:** Alle Einstellungen und Logs werden sauber im `.dump`-Unterverzeichnis des Projekts verwaltet.
 
 ## Installation
 
-1. Install the required dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
+1.  **Klonen/Herunterladen:** Lade das Repository herunter oder klone es.
+2.  **Abhängigkeiten installieren:** Stelle sicher, dass Python 3.x installiert und im PATH verfügbar ist. Öffne eine Kommandozeile im Projektverzeichnis und installiere die benötigten Pakete:
+    ```bash
+    pip install -e .
+    # Oder manuell, falls setup.py nicht verwendet wird:
+    # pip install pywin32==310 toml==0.10.2 gitpython==3.1.31
+    ```
+3.  **Kontextmenü registrieren:**
+    *   Finde die Datei `install_context_menu.bat`.
+    *   **Wichtig:** Stelle sicher, dass die Python-Skripte (`create_dump.py`, `add_to_ignore.py`) relativ zur `.bat`-Datei am erwarteten Ort liegen (standardmäßig wird erwartet, dass sie sich im selben Verzeichnis befinden, oft `scripts/` relativ zum Projekt-Root - passe ggf. die Pfade in der `.bat`-Datei an oder verschiebe sie).
+    *   Rechtsklicke auf `install_context_menu.bat` und wähle **"Als Administrator ausführen"**.
+    *   Folge den Anweisungen im Skript.
 
-2. Run the installation script by double-clicking `install.bat` or running it from an administrator command prompt:
-   ```
-   install.bat
-   ```
+## Benutzung
 
-   Note: The installation requires administrator privileges to modify the Windows Registry.
+Nach der Installation stehen dir folgende Optionen im Windows Explorer Kontextmenü zur Verfügung:
 
-## Usage
+*   **Rechtsklick auf Ordner-Hintergrund:**
+    *   `Create Dump (AI)`: Startet den Dump-Prozess für den aktuellen Ordner. Erstellt/überschreibt `dump.txt` im Ordner-Root.
+*   **Rechtsklick auf eine Datei:**
+    *   `Add to Local Ignore (AI)`: Fügt den relativen Pfad der Datei zu `.dump/.dump_ignore` hinzu.
+    *   `Add to Global Ignore (AI)`: Fügt den absoluten Pfad der Datei zur globalen Ignore-Liste in `.dump/.dump_config` hinzu.
+*   **Rechtsklick auf einen Ordner:**
+    *   `Add to Local Ignore (AI)`: Fügt den relativen Pfad des Ordners zu `.dump/.dump_ignore` hinzu.
+    *   `Add to Global Ignore (AI)`: Fügt den absoluten Pfad des Ordners zur globalen Ignore-Liste in `.dump/.dump_config` hinzu.
 
-### Creating a Dump
+## Konfiguration
 
-1. Right-click on any project directory in Windows Explorer
-2. Select "Create dump.txt" from the context menu
-3. A `dump.txt` file will be created in the selected directory containing all relevant code files
+Das Tool erstellt bei der ersten Verwendung in einem Projekt ein `.dump`-Unterverzeichnis.
 
-### Adding Files to Ignore List
+*   **`.dump/.dump_config` (TOML-Format):**
+    *   Die zentrale Konfigurationsdatei.
+    *   `[ignore]`:
+        *   `standard_patterns`: **Liste der Standard-Ignore-Muster.** Du kannst diese Liste hier bearbeiten, um die Standard-Ignores anzupassen! Enthält typischerweise Einträge wie `.git`, `node_modules`, `*.log`, `dist/`, `build/`, `dump.txt`, `.gitignore` etc.
+        *   `custom_patterns`: Füge hier eigene projektweite Ignore-Muster im `fnmatch`-Stil hinzu (z.B. `**/test_data/*`).
+        *   `ignored_paths`: Liste von **absoluten** Pfaden, die global ignoriert werden sollen.
+    *   `[output]`:
+        *   `include_file_headers`: `true` oder `false`, ob Datei-Header (`// FILE: ...`) eingefügt werden sollen.
+        *   `max_file_size`: Maximale Größe einer Datei in Bytes, die in den Dump aufgenommen wird.
+    *   Andere Sektionen (`general`, `language`, `languages`, `git`) speichern Metadaten und Erkennungsergebnisse.
 
-1. Right-click on any file or directory in Windows Explorer
-2. Select "Add to ignore for dump" from the context menu
-3. The file/directory will be added to the ignore list and won't be included in future dumps
+*   **`.dump/.dump_ignore` (Textdatei):**
+    *   Enthält eine Liste von relativen Pfaden (bezogen auf den Projekt-Root), die lokal ignoriert werden sollen.
+    *   Verwende Forward-Slashes (`/`). Ein Eintrag pro Zeile.
+    *   Wird typischerweise über das Kontextmenü "Add to Local Ignore (AI)" befüllt.
 
-### Ignore List Management
+*   **`.gitignore`:**
+    *   Wird automatisch gelesen und berücksichtigt.
 
-The tool uses multiple sources for determining which files to ignore:
+## Troubleshooting
 
-1. **Standard ignore patterns**: Built-in patterns for common build and dependency directories
-2. **Custom ignore patterns**: User-defined patterns stored in the `.dump_config` file
-3. **`.gitignore` patterns**: If a `.gitignore` file exists in the project, its patterns are automatically used
-4. **Explicitly ignored paths**: Specific files or directories added via the context menu
+*   **Kein Dump erstellt / Unerwartete Dateien ignoriert:**
+    *   Stelle sicher, dass die Dateien nicht durch eine Regel in `.gitignore`, `.dump_ignore`, `standard_patterns`, `custom_patterns` oder `ignored_paths` ausgeschlossen werden.
+    *   Überprüfe die `.dump/dump_error.log` auf Fehlermeldungen während des Dump-Prozesses.
+*   **Kontextmenü-Einträge funktionieren nicht:**
+    *   Wurde `install_context_menu.bat` als Administrator ausgeführt?
+    *   Ist Python korrekt installiert und im PATH?
+    *   Stimmen die Pfade zu den Python-Skripten (`create_dump.py`, `add_to_ignore.py`) in der `.bat`-Datei?
+    *   Existieren die Python-Skripte an den erwarteten Orten?
+*   **Fehlermeldungen beim Ausführen:**
+    *   Überprüfe `.dump/dump_error.log` für Details.
 
-## Uninstallation
+## Abhängigkeiten
 
-To remove the context menu entries, double-click `uninstall.bat` or run it from an administrator command prompt:
-```
-uninstall.bat
-```
-
-Note: The uninstallation requires administrator privileges to modify the Windows Registry.
-
-## Project Structure
-
-```
-create_dump_contextmenu/
-├── scripts/
-│   ├── install_contextmenu.py
-│   ├── uninstall_contextmenu.py
-│   ├── add_to_ignore.py
-│   └── create_dump.py
-│
-├── detectors/
-│   ├── language_detector.py
-│   ├── languages.py
-│   └── filter.py
-│
-├── utils/
-│   ├── file_utils.py
-│   ├── comment_utils.py
-│   └── config_manager.py
-│
-├── data/
-│   └── ignore_list.txt
-│
-├── install.bat
-├── uninstall.bat
-├── requirements.txt
-└── README.md
-```
-
-## Supported Languages
-
-- Java (.java, pom.xml, .gradle)
-- JavaScript (.js, .jsx, package.json)
-- TypeScript (.ts, .tsx, tsconfig.json)
-- Python (.py, requirements.txt, pyproject.toml)
-
-## Default Ignored Patterns
-
-The following patterns are ignored by default:
-- `.git`
-- `.idea`
-- `.venv`
-- `__pycache__`
-- `node_modules`
-- `*.lock`
-- `*.log`
-- `dist`
-- `build` 
+*   Python 3.x
+*   pywin32==310
+*   toml==0.10.2
+*   GitPython==3.1.31
