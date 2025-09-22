@@ -29,6 +29,11 @@ def find_project_root(start_path: Path) -> Path:
     Raises FileNotFoundError if no root marker is found up to the filesystem root.
     """
     current = start_path.resolve()
+    
+    # If the start_path is a file, start from its parent directory
+    if current.is_file():
+        current = current.parent
+    
     # Check current directory first
     if (current / '.git').exists() or (current / '.dump_config').exists():
         return current

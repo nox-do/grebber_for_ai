@@ -1,0 +1,4 @@
+/utils/__pycache__
+/detectors/__pycache__/*.pyc
+/.dump
+/dump.txt

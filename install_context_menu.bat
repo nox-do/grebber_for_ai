@@ -10,7 +10,7 @@ title Dump für AI Context Menu Toggler
 :: --------------------------------------------------------------------------
 :: Standard-Konfiguration - BITTE PFADE ANPASSEN FALLS NÖTIG
 :: --------------------------------------------------------------------------
-set "DEFAULT_PYTHON_EXE=C:\Users\Daniel\AppData\Local\Programs\Python\Python313\python.exe"
+set "DEFAULT_PYTHON_EXE=C:\Users\Daniel\AppData\Local\Programs\Python\Python311\python.exe"
 set "CREATE_DUMP_SCRIPT=C:\git_cursor\grebber_for_ai\scripts\create_dump.py"
 set "ADD_IGNORE_SCRIPT=C:\git_cursor\grebber_for_ai\scripts\add_to_ignore.py"
 

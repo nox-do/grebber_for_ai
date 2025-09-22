@@ -142,10 +142,15 @@ class ConfigManager:
         if gitignore_path.exists():
             try:
                 with open(gitignore_path, 'r', encoding='utf-8') as f:
-                    for line in f:
+                    for line_num, line in enumerate(f, 1):
                         line = line.strip()
-                        if line and not line.startswith('#'):
-                            patterns.append(line)
+                        # Skip empty lines and comments
+                        if not line or line.startswith('#'):
+                            continue
+                        # Skip negation patterns for now (they need special handling)
+                        if line.startswith('!'):
+                            continue
+                        patterns.append(line)
             except Exception as e:
                 log_error(str(self.project_dir), f"Error reading .gitignore file {gitignore_path}: {e}")
         return patterns
@@ -271,24 +276,42 @@ class ConfigManager:
 
         for pattern in patterns:
             clean_pattern = pattern.strip().replace('\\', '/')
-            if not clean_pattern: continue # Skip empty patterns
+            if not clean_pattern: 
+                continue # Skip empty patterns
 
+            # Handle directory patterns (ending with /)
             if clean_pattern.endswith('/'):
                 pattern_base = clean_pattern.rstrip('/')
                 if path_to_check.is_dir() and (relative_path_str_norm == pattern_base or relative_path_str_norm.startswith(pattern_base + '/')):
                      return True
-                # Check if item is within a dir matching the pattern (more general)
+                # Check if item is within a dir matching the pattern
                 if relative_path_str_norm.startswith(pattern_base + '/'):
                      return True
 
+            # Handle root patterns (starting with /)
             elif clean_pattern.startswith('/'):
                  pattern_base = clean_pattern.lstrip('/')
                  # Match only from the root
                  if fnmatch.fnmatch(relative_path_str_norm, pattern_base):
                       return True
 
-            else: # General pattern matching (applies anywhere)
-                if fnmatch.fnmatch(relative_path_str_norm, clean_pattern) or fnmatch.fnmatch(file_name, clean_pattern):
+            # Handle ** patterns (recursive matching)
+            elif '**' in clean_pattern:
+                # Convert ** to proper fnmatch pattern
+                fnmatch_pattern = clean_pattern.replace('**', '*')
+                if fnmatch.fnmatch(relative_path_str_norm, fnmatch_pattern) or fnmatch.fnmatch(file_name, fnmatch_pattern):
+                    return True
+
+            # General pattern matching (applies anywhere)
+            else:
+                # Try matching the full relative path first
+                if fnmatch.fnmatch(relative_path_str_norm, clean_pattern):
+                    return True
+                # Then try matching just the filename
+                if fnmatch.fnmatch(file_name, clean_pattern):
+                    return True
+                # For directory patterns without trailing slash, check if path starts with pattern
+                if clean_pattern and not clean_pattern.endswith('*') and relative_path_str_norm.startswith(clean_pattern + '/'):
                     return True
         return False
 
